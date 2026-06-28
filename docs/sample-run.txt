@@ -1,0 +1,10 @@
+  [ROUTE] 01-sales-lead.eml            -> sales_lead             (1.00) -> sales_pipeline +DRAFT
+  [ROUTE] 02-support-request.eml       -> support_request        (0.80) -> support_l1 +DRAFT
+  [ROUTE] 03-billing-question.eml      -> billing_question       (1.00) -> billing_team 
+  [ROUTE] 04-feature-request.eml       -> feature_request        (1.00) -> product_backlog +DRAFT
+  [ROUTE] 05-newsletter.eml            -> newsletter_or_marketing (1.00) -> archive_marketing 
+  [ROUTE] 06-internal.eml              -> internal               (1.00) -> internal 
+  [REVIEW] 07-ambiguous.eml             -> unknown                (0.00) -> human_review 
+
+  Classifier backend: rules.  Drafter backend: substitution.
+  6/7 routed confidently; 1 sent to human_review; 3 replies drafted.

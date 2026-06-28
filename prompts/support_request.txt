@@ -1,0 +1,16 @@
+Hi {sender_name},
+
+Thanks for the report - sorry you're hitting this. I want to make sure I have everything I need to help.
+
+You wrote: "{body_excerpt}"
+
+Could you send over:
+1. The exact steps to reproduce (or a screen recording if it's easier)
+2. The browser + OS you're on
+3. Your account email if it's different from this one
+4. Roughly when this started happening
+
+Ticket reference for this thread: SUP-AUTO-<replace-with-generated-id>. I'll keep you posted as we look into it.
+
+Best,
+[Your name]

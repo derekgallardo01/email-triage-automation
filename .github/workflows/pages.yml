@@ -1,0 +1,232 @@
+name: Deploy live demo to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: pip install --quiet -e .
+
+      - name: Generate the static demo report
+        run: |
+          mkdir -p site
+          python - <<'PY'
+          import html, json, sys
+          from dataclasses import asdict
+          from pathlib import Path
+          sys.path.insert(0, "src")
+          from email_triage.classifier import Classifier, route
+          from email_triage.drafter import Drafter
+          from email_triage.parser import parse_eml_file
+
+          FIXTURES = Path("fixtures")
+          clf = Classifier(internal_domains=["example.com"])
+          drafter = Drafter()
+          cards = []
+          for fixture in sorted(FIXTURES.glob("*.eml")):
+              email_obj = parse_eml_file(fixture)
+              r = clf.classify(email_obj)
+              d = route(r, clf.catalog)
+              draft = None
+              if d.drafts_reply:
+                  drafted = drafter.draft(email_obj, d.label)
+                  if drafted and not drafted.error:
+                      draft = asdict(drafted)
+              cards.append({"file": fixture.name, "email": email_obj,
+                            "result": r, "decision": d, "draft": draft})
+
+          def render_card(c):
+              email_obj = c["email"]
+              r = c["result"]
+              d = c["decision"]
+              status_class = "review" if d.review_required else "routed"
+              status_label = "HUMAN REVIEW" if d.review_required else "AUTO-ROUTED"
+
+              draft_html = ""
+              if c["draft"]:
+                  body_html = html.escape(c["draft"]["body"]).replace("\n", "<br>")
+                  draft_html = f"""
+                    <div class="kicker">Drafted reply (substitution backend)</div>
+                    <div class="draft">
+                      <div class="draft-subject">Subject: {html.escape(c['draft']['subject'])}</div>
+                      <div class="draft-body">{body_html}</div>
+                    </div>
+                  """
+              elif d.drafts_reply:
+                  draft_html = "<div class='kicker'>Drafted reply</div><div class='draft'>(no template found)</div>"
+
+              reason = ""
+              if d.review_required:
+                  reason = f"<div class='reason'>Reason: {html.escape(d.handoff_reason or '')}</div>"
+
+              cands_str = " &middot; ".join(f"<code>{html.escape(n)}</code> {s:.2f}" for n, s in r.candidates)
+
+              return f"""
+                <div class="card">
+                  <div class="card-header">
+                    <span class="badge {status_class}">{status_label}</span>
+                    <span class="fname">{html.escape(c['file'])}</span>
+                  </div>
+                  <div class="email-head">
+                    <div><strong>From:</strong> {html.escape(email_obj.sender_name)} &lt;{html.escape(email_obj.sender_email)}&gt;</div>
+                    <div><strong>Subject:</strong> {html.escape(email_obj.subject)}</div>
+                  </div>
+                  <details><summary>Body preview</summary><pre>{html.escape(email_obj.preview(400))}</pre></details>
+                  <div class="grid">
+                    <div>
+                      <div class="kicker">Classified as</div>
+                      <div class="label"><code>{html.escape(r.label)}</code></div>
+                    </div>
+                    <div>
+                      <div class="kicker">Confidence</div>
+                      <div class="conf">{r.confidence:.2f}</div>
+                    </div>
+                    <div>
+                      <div class="kicker">Routed to</div>
+                      <div class="queue"><code>{html.escape(d.queue)}</code> &middot; SLA {d.sla_hours}h</div>
+                    </div>
+                  </div>
+                  <div class="kicker">Top candidates</div>
+                  <div class="cands">{cands_str}</div>
+                  {reason}
+                  {draft_html}
+                </div>
+              """
+
+          page = f"""<!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Email triage automation - live demo</title>
+            <style>
+              :root {{
+                --primary: #be185d; --accent: #ec4899;
+                --bg: #fdf2f8; --border: #fbcfe8;
+                --ink: #500724; --muted: #6b7280;
+                --review: #c2410c; --routed: #047857;
+              }}
+              * {{ box-sizing: border-box; }}
+              body {{
+                margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;
+                background: var(--bg); color: var(--ink); line-height: 1.5;
+              }}
+              .hero {{
+                background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+                color: white; padding: 50px 24px 60px;
+              }}
+              .hero-inner {{ max-width: 1000px; margin: 0 auto; }}
+              .hero .kicker {{ font-size: 13px; letter-spacing: 2px; opacity: .75; text-transform: uppercase; }}
+              .hero h1 {{ font-size: 38px; margin: 10px 0 14px; line-height: 1.1; }}
+              .hero p {{ font-size: 17px; margin: 0; opacity: .92; max-width: 760px; }}
+              .container {{ max-width: 1000px; margin: -30px auto 60px; padding: 0 24px; }}
+              .card {{
+                background: white; border: 1px solid var(--border); border-radius: 12px;
+                padding: 20px 24px; margin: 16px 0;
+                box-shadow: 0 1px 3px rgba(190, 24, 93, .08);
+              }}
+              .card-header {{ display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }}
+              .badge {{
+                color: white; padding: 4px 10px; border-radius: 12px;
+                font-size: 11px; letter-spacing: 1px; font-weight: 700;
+              }}
+              .badge.review {{ background: var(--review); }}
+              .badge.routed {{ background: var(--routed); }}
+              .fname {{ font-weight: 600; font-family: Consolas, monospace; }}
+              .email-head {{ background: #fce7f3; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-bottom: 12px; }}
+              details summary {{ cursor: pointer; color: var(--accent); font-weight: 600; margin-bottom: 8px; font-size: 13px; }}
+              pre {{
+                background: #500724; color: #fce7f3; padding: 14px 16px;
+                border-radius: 8px; overflow-x: auto;
+                font-family: Consolas, Menlo, monospace; font-size: 12px;
+                white-space: pre-wrap; word-wrap: break-word;
+              }}
+              .grid {{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin: 12px 0; }}
+              .kicker {{
+                font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+                color: var(--muted); margin: 8px 0 4px; font-weight: 600;
+              }}
+              .label code, .queue code {{
+                background: #fce7f3; padding: 3px 8px; border-radius: 5px;
+                color: var(--primary); font-weight: 600; font-size: 14px;
+              }}
+              .conf {{ font-family: Consolas, monospace; font-size: 18px; font-weight: 600; }}
+              .queue {{ font-size: 13px; }}
+              .cands code {{
+                background: #fdf2f8; padding: 2px 7px; border-radius: 4px;
+                color: var(--primary); font-size: 12px;
+              }}
+              .reason {{ margin-top: 10px; color: var(--review); font-size: 13px; font-style: italic; }}
+              .draft {{
+                background: #ecfdf5; border-left: 4px solid #047857;
+                padding: 14px 18px; border-radius: 4px; margin-top: 6px;
+                font-size: 13px;
+              }}
+              .draft-subject {{ font-weight: 700; color: #064e3b; margin-bottom: 8px; }}
+              .draft-body {{ color: #064e3b; }}
+              .footer {{
+                margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border);
+                color: var(--muted); font-size: 13px; text-align: center;
+              }}
+              .footer code {{ background: #fce7f3; padding: 2px 6px; border-radius: 4px; }}
+              a {{ color: var(--accent); }}
+            </style>
+          </head>
+          <body>
+            <div class="hero">
+              <div class="hero-inner">
+                <div class="kicker">Inbox triage &middot; Classify &middot; Route &middot; Draft</div>
+                <h1>Email triage automation - live demo</h1>
+                <p>Seven bundled EML fixtures span six common inbox categories
+                plus one ambiguous email. For each one: classify, route to the
+                right queue, and optionally draft a reply. Default backend is
+                rule-based classification + substitution drafting (deterministic,
+                no API keys). One env var swaps to an LLM drafter.</p>
+              </div>
+            </div>
+
+            <div class="container">
+              {''.join(render_card(c) for c in cards)}
+
+              <div class="footer">
+                Regenerated on every push.
+                Install: <code>pip install -e .</code> then <code>email-triage demo</code>.<br>
+                Source: <a href="https://github.com/derekgallardo01/email-triage-automation">github.com/derekgallardo01/email-triage-automation</a>
+              </div>
+            </div>
+          </body>
+          </html>
+          """
+          with open("site/index.html", "w", encoding="utf-8") as fh:
+              fh.write(page)
+          print("wrote site/index.html")
+          PY
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

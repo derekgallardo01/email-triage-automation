@@ -1,0 +1,10 @@
+Hi {sender_name},
+
+Thanks for reaching out about {subject}. I'd love to set up a 30-minute call to walk you through how the product would fit your specific use case - much more efficient than a written reply for this.
+
+A few good slots this week: Tuesday 10am, Wednesday 2pm, or Friday 11am (all Pacific). Reply with whichever works and I'll send a calendar invite with a Zoom link.
+
+If you'd rather start with self-serve, our pricing and trial are at https://example.com/pricing.
+
+Looking forward to it,
+[Your name]

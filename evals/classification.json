@@ -1,0 +1,12 @@
+{
+  "description": "Classification eval cases - each (fixture, expected_label) pair. Harness computes per-class precision/recall/F1 + overall accuracy.",
+  "cases": [
+    {"id": "sales-lead",      "fixture": "01-sales-lead.eml",      "expected": "sales_lead"},
+    {"id": "support",         "fixture": "02-support-request.eml", "expected": "support_request"},
+    {"id": "billing",         "fixture": "03-billing-question.eml","expected": "billing_question"},
+    {"id": "feature-request", "fixture": "04-feature-request.eml", "expected": "feature_request"},
+    {"id": "newsletter",      "fixture": "05-newsletter.eml",      "expected": "newsletter_or_marketing"},
+    {"id": "internal",        "fixture": "06-internal.eml",        "expected": "internal"},
+    {"id": "ambiguous",       "fixture": "07-ambiguous.eml",       "expected": "unknown"}
+  ]
+}

@@ -1,0 +1,14 @@
+Hi {sender_name},
+
+Thanks for the suggestion - "{subject}" is exactly the kind of feedback that shapes our roadmap.
+
+I've logged this in our product backlog. A couple of follow-up questions to help us prioritize:
+
+1. Roughly how often would you use this if it shipped? (daily / weekly / occasionally)
+2. What's the workaround you're using today, if any?
+3. Is this blocking something specific, or more of a nice-to-have?
+
+You can also star or upvote in our public board if you want updates: https://example.com/roadmap.
+
+Thanks again,
+[Your name]

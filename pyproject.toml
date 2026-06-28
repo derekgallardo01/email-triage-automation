@@ -1,0 +1,27 @@
+[project]
+name = "email-triage"
+version = "1.0.0"
+description = "End-to-end inbox triage: parse incoming emails, classify them, route to the right queue, draft a reply where appropriate, send low-confidence cases to human review. Composes a classifier + a per-class reply-template registry + a confidence-thresholded router. Stub-by-default; one env var swaps to an LLM."
+authors = [{name = "Derek Gallardo", email = "derekgallardo01@gmail.com"}]
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+llm = [
+    "anthropic>=0.40.0",
+]
+
+[project.scripts]
+email-triage = "email_triage.cli:main"
+
+[project.urls]
+Repository = "https://github.com/derekgallardo01/email-triage-automation"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

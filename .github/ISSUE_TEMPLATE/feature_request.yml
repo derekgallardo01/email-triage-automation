@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest a new capability or improvement to the kit.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        These kits are intentionally small — focused capability demos,
+        not full products. Features that fit that shape land easiest.
+        See [CONTRIBUTING.md](../CONTRIBUTING.md) for what tends to land.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What's the real-world situation this would help with?
+      placeholder: |
+        When I tried to use the kit on …, the kit didn't handle …
+        I worked around it by …
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: What would you add or change? If you have an API sketch, paste it.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider? Why not those?
+  - type: checkboxes
+    id: scope-check
+    attributes:
+      label: Scope check
+      options:
+        - label: "This change would land in a single PR (not a sweeping refactor)"
+        - label: "This change keeps the kit stdlib-only, OR puts any new dependency behind a clear seam"
+        - label: "This change would come with at least one new eval / test case"

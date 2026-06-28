@@ -1,0 +1,21 @@
+{
+  "name": "REPO_NAME",
+  "build": {
+    "dockerfile": "../Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "bierner.markdown-mermaid"
+      ],
+      "settings": {
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false
+      }
+    }
+  },
+  "postCreateCommand": "python -m pytest -q || true",
+  "remoteUser": "root"
+}

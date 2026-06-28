@@ -1,0 +1,19 @@
+Message-ID: <CAJk_demo-002@mail.example.com>
+Date: Fri, 27 Jun 2026 11:42:00 -0700
+From: Tom Reynolds <tom.r@bayview-customer.com>
+To: support@example.com
+Subject: Dashboard is broken on Safari since yesterday
+
+Hi,
+
+The main analytics dashboard has been broken on Safari since yesterday
+afternoon. The charts just stay blank and the console shows an error
+about a missing field.
+
+I tried clearing the cache. Same problem. Works fine on Chrome on the
+same machine, so it's something Safari-specific.
+
+Can you take a look? This is blocking my Monday report.
+
+Thanks,
+Tom

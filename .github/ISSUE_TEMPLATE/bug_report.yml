@@ -1,0 +1,56 @@
+name: Bug report
+description: Something in the kit doesn't behave as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Before opening,
+        please run `python -m pytest -q` and the eval/validate script
+        on a fresh clone of `main` to confirm it's not just an env issue.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you do, what did you see, what did you expect to see?
+      placeholder: |
+        Steps:
+        1. `git clone …`
+        2. `python …`
+        3. Output: …
+        Expected: …
+    validations:
+      required: true
+  - type: input
+    id: kit-version
+    attributes:
+      label: Kit version
+      description: Git commit (or release tag) on `main` you're running.
+      placeholder: e.g. v1.0.0 / commit abc1234
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      description: Output of `python --version`
+      placeholder: e.g. Python 3.11.7
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other / Docker
+    validations:
+      required: true
+  - type: textarea
+    id: test-output
+    attributes:
+      label: Output of `pytest` + the relevant eval/validate runner
+      description: Paste the full output, including the lines that pass.
+      render: text

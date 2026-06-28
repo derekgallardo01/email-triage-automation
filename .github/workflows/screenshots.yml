@@ -1,0 +1,44 @@
+name: Capture screenshots
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright (chromium)
+        run: |
+          npm init -y > /dev/null
+          npm install --silent playwright
+          npx playwright install --with-deps chromium
+
+      - name: Capture screenshots from the live Pages demo
+        run: node .github/scripts/capture-screenshots.js
+        env:
+          DEMO_BASE: https://derekgallardo01.github.io/email-triage-automation
+
+      - name: Commit screenshots if changed
+        run: |
+          git config user.name "Derek Gallardo"
+          git config user.email "derekgallardo01@gmail.com"
+          git add docs/screenshots/
+          if git diff --cached --quiet; then
+            echo "No screenshot changes."
+          else
+            git commit -m "chore: refresh auto-captured screenshots"
+            # Race-condition guard: pull --rebase in case portfolio.yml committed in parallel.
+            git pull --rebase origin main || true
+            git push
+          fi

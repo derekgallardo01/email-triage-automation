@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use or reference this kit, please cite it as below."
+title: "Email triage automation"
+authors:
+  - family-names: "Gallardo"
+    given-names: "Derek"
+repository-code: "https://github.com/derekgallardo01/email-triage-automation"
+url: "https://github.com/derekgallardo01/email-triage-automation"
+license: MIT
+version: "1.0.0"
+date-released: "2026-06-28"
+keywords:
+  - email-triage
+  - inbox-automation
+  - classification
+  - reply-drafter
+  - human-review
+  - capability-demo

@@ -1,0 +1,42 @@
+name: Capture portfolio images
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  portfolio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Playwright (chromium)
+        run: |
+          npm init -y > /dev/null
+          npm install --silent playwright
+          npx playwright install --with-deps chromium
+
+      - name: Generate branded portfolio cards
+        run: node .github/scripts/generate-portfolio.js
+
+      - name: Commit portfolio images if changed
+        run: |
+          git config user.name "Derek Gallardo"
+          git config user.email "derekgallardo01@gmail.com"
+          git add docs/portfolio/
+          if git diff --cached --quiet; then
+            echo "No portfolio changes."
+          else
+            git commit -m "chore: refresh branded portfolio images"
+            # Race-condition guard: pull --rebase in case screenshots.yml committed in parallel.
+            git pull --rebase origin main || true
+            git push
+          fi

@@ -1,0 +1,12 @@
+{
+  "repo": "email-triage-automation",
+  "title": "Email Triage Automation",
+  "tagline": "End-to-end inbox triage: parse incoming emails, classify them, route to the right queue (sales / support / billing / etc.), draft a reply where appropriate, send low-confidence cases to human review. Stub-by-default; one env var swaps to an LLM drafter.",
+  "kicker": "Inbox Automation · Classify · Route · Draft · Capability Demo",
+  "features": [
+    {"label": "Classes", "value": "6 + unknown fallback"},
+    {"label": "Fixtures", "value": "7 EMLs (1 per class + 1 ambiguous)"},
+    {"label": "Tests + Evals", "value": "33 pytest + 10 golden"}
+  ],
+  "theme": {"primary": "#be185d", "accent": "#ec4899"}
+}

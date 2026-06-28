@@ -1,0 +1,23 @@
+{
+  "description": "Draft-quality eval cases. Each case asserts the drafted reply (a) is non-empty, (b) addresses the sender by name, (c) contains required phrases. Catches regressions when someone edits a template and accidentally breaks the sender_name substitution or removes required CTAs.",
+  "cases": [
+    {
+      "id": "sales-lead-greets-and-offers-call",
+      "fixture": "01-sales-lead.eml",
+      "class": "sales_lead",
+      "rubric": {"contains_all": ["Maya", "30-minute call", "Tuesday", "pricing"]}
+    },
+    {
+      "id": "support-asks-clarifying-questions",
+      "fixture": "02-support-request.eml",
+      "class": "support_request",
+      "rubric": {"contains_all": ["Tom", "browser + OS", "ticket reference", "screen recording"]}
+    },
+    {
+      "id": "feature-request-acknowledges-and-asks-priority",
+      "fixture": "04-feature-request.eml",
+      "class": "feature_request",
+      "rubric": {"contains_all": ["Alex", "roadmap", "prioritize"]}
+    }
+  ]
+}

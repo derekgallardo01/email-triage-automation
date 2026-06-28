@@ -40,6 +40,14 @@ docker run --rm email-triage pytest -q                  # runs the tests
 docker run --rm -v $(pwd)/inbox:/inbox email-triage email-triage triage /inbox/your.eml
 ```
 
+## Example: production scenario
+
+**[examples/imap_poller.py](examples/imap_poller.py)** — Polls IMAP, triages every unread message, saves drafts to the Drafts folder, labels messages with the routing decision (Gmail X-GM-LABELS or standard IMAP keywords)
+
+```bash
+python examples/imap_poller.py
+```
+
 ## What it's for
 
 Every SMB engagement eventually asks "can we automate our inbox?"
